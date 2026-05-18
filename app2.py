@@ -4,11 +4,12 @@ from datetime import datetime
 import yfinance as yf
 
 st.set_page_config(page_title="ISM - Índice de Salud del Mercado", layout="wide")
+
 st.title("📊 Índice de Salud del Mercado (ISM)")
 st.markdown("**Modelo creado para evaluar el estado real de los mercados financieros**")
 
 # ==================== DATOS EN TIEMPO REAL ====================
-if st.button("🔄 Actualizar datos de mercado"):
+if st.button("🔄 Actualizar datos de mercado (VIX, Petróleo, etc.)"):
     st.cache_data.clear()
 
 @st.cache_data(ttl=60)
@@ -24,14 +25,17 @@ def get_market_data():
 
 vix, oil, dxy, gold = get_market_data()
 
-# ==================== DATOS MANUALES ====================
+# ==================== DATOS MANUALES (Actualizados al 18 de mayo) ====================
 data = {
-    "Variable": ["Resultados Empresariales", "Oferta y Demanda", "Flujos de Liquidez", "Ciclo del Dólar", 
-                 "PIB/Crecimiento Económico", "Sentimiento del Mercado", "Inflación", "Tipos de Interés", 
-                 "Eventos Geopolíticos", "Confianza Consumidor/Inversor", "Tasa de Desempleo", 
-                 "Valoraciones de Mercado", "Volatilidad (VIX)"],
+    "Variable": [
+        "Resultados Empresariales", "Oferta y Demanda", "Flujos de Liquidez",
+        "Ciclo del Dólar", "PIB/Crecimiento Económico", "Sentimiento del Mercado",
+        "Inflación", "Tipos de Interés", "Eventos Geopolíticos",
+        "Confianza Consumidor/Inversor", "Tasa de Desempleo",
+        "Valoraciones de Mercado", "Volatilidad (VIX)"
+    ],
     "Peso (%)": [18, 15, 12, 10, 10, 9, 4, 4, 7, 6, 5, 5, 4],
-    "Score": [4.5, 3.2, 4.0, 4.0, 4.0, 3.7, 2.0, 2.0, 3.0, 3.5, 3.5, 3.2, 3.0]
+    "Score": [4.5, 3.0, 4.0, 4.0, 4.0, 3.6, 2.0, 2.0, 3.0, 3.5, 3.5, 3.2, 3.2]
 }
 
 df = pd.DataFrame(data)
@@ -48,16 +52,17 @@ st.subheader("📈 Datos de Mercado en Tiempo Real")
 if vix is None:
     st.warning("⚠️ No se pudieron actualizar los datos en tiempo real. Usa el botón de arriba.")
 else:
-    st.success(f"VIX: **{vix}** | Petróleo Brent: **{oil}** | Dólar Index: **{dxy}** | Oro: **{gold}**")
+    st.success(f"**VIX:** {vix} | **Petróleo Brent:** {oil} | **Dólar Index:** {dxy} | **Oro:** {gold}")
 
 st.subheader("Detalle de Variables")
 st.dataframe(df, use_container_width=True)
 
+# Interpretación
 if total_ism >= 4.3:
-    st.success("**Sesgo Ofensivo Moderado** - Mercado saludable")
+    st.success("**Sesgo Ofensivo Moderado** → Mercado saludable")
 elif total_ism >= 3.9:
-    st.warning("**Neutral / Cauteloso** - Selectividad alta recomendada")
+    st.warning("**Neutral / Cauteloso** → Selectividad alta recomendada")
 else:
-    st.error("**Sesgo Defensivo** - Mayor precaución")
+    st.error("**Sesgo Defensivo** → Mayor precaución")
 
 st.caption("App desarrollada con ❤️ y la ayuda de Grok (xAI)")
