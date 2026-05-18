@@ -8,7 +8,7 @@ st.title("📊 Índice de Salud del Mercado (ISM)")
 st.markdown("**Modelo creado para evaluar el estado real de los mercados financieros**")
 
 # Datos en tiempo real
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=60)   # Actualiza cada 60 segundos
 def get_market_data():
     try:
         vix = yf.Ticker("^VIX").history(period="1d")['Close'].iloc[-1]
@@ -17,6 +17,7 @@ def get_market_data():
         gold = yf.Ticker("GC=F").history(period="1d")['Close'].iloc[-1]
         return round(vix, 2), round(oil, 2), round(dxy, 2), round(gold, 2)
     except:
+        st.warning("⚠️ No se pudieron actualizar los datos en tiempo real")
         return 18.5, 78.5, 102.8, 2450
 
 vix, oil, dxy, gold = get_market_data()
