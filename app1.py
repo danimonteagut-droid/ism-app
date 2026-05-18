@@ -5,7 +5,7 @@ import yfinance as yf
 st.set_page_config(page_title="ISM - Índice de Salud del Mercado", layout="wide")
 st.title("Índice de Salud del Mercado (ISM)")
 st.markdown("**Modelo creado para evaluar el estado real de los mercados financieros**")
-# ==================== VARIABLES AUTOMÁTICAS =====================
+# ==================== VARIABLES AUTOMÁTICAS  =====================
 @st.cache_data(ttl=300)  # Actualiza cada 5 minutos
 def get_market_data():
     try:
