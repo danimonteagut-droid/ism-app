@@ -7,8 +7,11 @@ st.set_page_config(page_title="ISM - Índice de Salud del Mercado", layout="wide
 st.title("📊 Índice de Salud del Mercado (ISM)")
 st.markdown("**Modelo creado para evaluar el estado real de los mercados financieros**")
 
-# Datos en tiempo real
-@st.cache_data(ttl=60)   # Actualiza cada 60 segundos
+# ==================== DATOS EN TIEMPO REAL ====================
+if st.button("🔄 Actualizar datos de mercado"):
+    st.cache_data.clear()
+
+@st.cache_data(ttl=60)
 def get_market_data():
     try:
         vix = yf.Ticker("^VIX").history(period="1d")['Close'].iloc[-1]
@@ -17,33 +20,35 @@ def get_market_data():
         gold = yf.Ticker("GC=F").history(period="1d")['Close'].iloc[-1]
         return round(vix, 2), round(oil, 2), round(dxy, 2), round(gold, 2)
     except:
-        st.warning("⚠️ No se pudieron actualizar los datos en tiempo real")
-        return 18.5, 78.5, 102.8, 2450
+        return None, None, None, None
 
 vix, oil, dxy, gold = get_market_data()
 
-# Datos manuales
+# ==================== DATOS MANUALES ====================
 data = {
     "Variable": ["Resultados Empresariales", "Oferta y Demanda", "Flujos de Liquidez", "Ciclo del Dólar", 
                  "PIB/Crecimiento Económico", "Sentimiento del Mercado", "Inflación", "Tipos de Interés", 
                  "Eventos Geopolíticos", "Confianza Consumidor/Inversor", "Tasa de Desempleo", 
                  "Valoraciones de Mercado", "Volatilidad (VIX)"],
     "Peso (%)": [18, 15, 12, 10, 10, 9, 4, 4, 7, 6, 5, 5, 4],
-    "Score": [4.5, 3.2, 4.0, 4.0, 4.0, 3.7, 2.0, 2.0, 3.0, 3.5, 3.5, 3.2, round(vix/10,1)]
+    "Score": [4.5, 3.2, 4.0, 4.0, 4.0, 3.7, 2.0, 2.0, 3.0, 3.5, 3.5, 3.2, 3.0]
 }
 
 df = pd.DataFrame(data)
 df["Ponderado"] = (df["Score"] * df["Peso (%)"] / 100).round(3)
 total_ism = df["Ponderado"].sum().round(2)
 
-# Dashboard
+# ==================== DASHBOARD ====================
 col1, col2, col3 = st.columns(3)
 col1.metric("**Índice ISM Actual**", f"{total_ism}")
 col2.metric("**Interpretación**", "Neutral / Cauteloso")
 col3.metric("**Fecha**", datetime.now().strftime("%d de mayo de 2026"))
 
 st.subheader("📈 Datos de Mercado en Tiempo Real")
-st.info(f"VIX: **{vix}** | Petróleo Brent: **{oil}** | Dólar Index: **{dxy}** | Oro: **{gold}**")
+if vix is None:
+    st.warning("⚠️ No se pudieron actualizar los datos en tiempo real. Usa el botón de arriba.")
+else:
+    st.success(f"VIX: **{vix}** | Petróleo Brent: **{oil}** | Dólar Index: **{dxy}** | Oro: **{gold}**")
 
 st.subheader("Detalle de Variables")
 st.dataframe(df, use_container_width=True)
