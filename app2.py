@@ -6,11 +6,11 @@ import yfinance as yf
 st.set_page_config(page_title="ISM - Índice de Salud del Mercado", layout="wide")
 
 st.title("📊 Índice de Salud del Mercado (ISM)")
-st.markdown("**Modelo creado para evaluar el estado real de los mercados financieros**")
+st.markdown("**Herramienta para evaluar el estado actual de los mercados financieros**")
 
-# ==================== DATOS EN TIEMPO REAL (con mejor manejo) ====================
+# ==================== DATOS EN TIEMPO REAL ====================
 st.subheader("📈 Datos de Mercado en Tiempo Real")
-if st.button("🔄 Actualizar datos automáticos (VIX, Petróleo, etc.)"):
+if st.button("🔄 Actualizar datos automáticos"):
     st.cache_data.clear()
 
 @st.cache_data(ttl=60)
@@ -27,7 +27,7 @@ def get_market_data():
 vix, oil, dxy, gold = get_market_data()
 
 if vix is None:
-    st.info("ℹ️ Datos en tiempo real no disponibles en este momento. Puedes ajustar manualmente abajo.")
+    st.info("ℹ️ Datos en tiempo real no disponibles en este momento.")
 else:
     st.success(f"**VIX:** {vix} | **Petróleo Brent:** {oil} | **Dólar Index:** {dxy} | **Oro:** {gold}")
 
@@ -50,7 +50,7 @@ scores = {
     "Volatilidad (VIX)": st.number_input("Volatilidad (VIX)", 1.0, 5.0, 3.2, 0.1),
 }
 
-# Cálculo
+# ==================== CÁLCULO ====================
 weights = [18,15,12,10,10,9,4,4,7,6,5,5,4]
 df = pd.DataFrame({
     "Variable": list(scores.keys()),
@@ -60,7 +60,7 @@ df = pd.DataFrame({
 df["Ponderado"] = (df["Score"] * df["Peso (%)"] / 100).round(3)
 total_ism = df["Ponderado"].sum().round(2)
 
-# Dashboard
+# ==================== DASHBOARD ====================
 col1, col2, col3 = st.columns(3)
 col1.metric("**Índice ISM Actual**", f"{total_ism}")
 col2.metric("**Interpretación**", "Neutral / Cauteloso")
@@ -69,11 +69,12 @@ col3.metric("**Fecha**", datetime.now().strftime("%d de mayo de 2026"))
 st.subheader("Detalle de Variables")
 st.dataframe(df, use_container_width=True)
 
+# Interpretación mejorada
 if total_ism >= 4.3:
-    st.success("**Sesgo Ofensivo Moderado** → Mercado saludable")
+    st.success("**Sesgo Ofensivo Moderado** → Mercado saludable. Buen entorno para posiciones de crecimiento.")
 elif total_ism >= 3.9:
-    st.warning("**Neutral / Cauteloso** → Selectividad alta recomendada")
+    st.warning("**Neutral / Cauteloso** → Selectividad alta recomendada. Combinar growth con value.")
 else:
-    st.error("**Sesgo Defensivo** → Mayor precaución")
+    st.error("**Sesgo Defensivo** → Mayor precaución. Priorizar hedges y activos defensivos.")
 
-st.caption("App desarrollada con ❤️ y la ayuda de Grok (xAI)")
+st.caption("App desarrollada con ❤️ y la ayuda de Grok (xAI) | Uso solo informativo - No es asesoramiento financiero")
